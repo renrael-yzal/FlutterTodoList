@@ -1,0 +1,73 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/widgets.dart';
+import 'package:http/http.dart';
+import 'package:todo_list_application/domain/entities/todo.dart';
+
+class DataSeeker {
+  // static String url = "http://localhost:8080/todos";
+  static List<Todo> tasks = [];
+
+  static final String url = "https://jsonplaceholder.typicode.com/posts";
+  static fetch() async {
+    try {
+      final response = await get(Uri.parse(DataSeeker.url));
+      final jsonData = jsonDecode(response.body);
+      for (var element in jsonData as List) {
+        // print(">>>>>>>>>${element["title"]}");
+        setState() {
+          DataSeeker.tasks.add(Todo(element["id"], element["title"], false));
+        }
+      }
+    } catch (err) {
+      print(">>>>>>>>>>>>>>>>>$err>>>>>>>>>>>");
+    }
+    return;
+  }
+
+  static List<Todo> fetchTodos() {
+    List<Todo> temp = [Todo(2, "task", false)];
+    fetch();
+    print(">>>>>>>>>>>>>");
+    print(DataSeeker.tasks);
+    print(">>>>>>>>>>>>>");
+
+    return temp;
+  }
+
+  static void postData(Todo todo) async {
+    try {
+      final response = await post(Uri.parse(DataSeeker.url),
+          body: jsonEncode({"title": todo.title, "status": "0"}),
+          headers: {
+            "Accept": "application/json",
+            "content-type": "application/json"
+          });
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  void putData(Todo todo) async {
+    try {
+      final response = await put(Uri.parse("${DataSeeker.url}/${todo.id}"),
+          body: jsonEncode({"title": todo.title, "status": "0"}),
+          headers: {
+            "Accept": "application/json",
+            "content-type": "application/json"
+          });
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  void deleteData(Todo todo) async {
+    try {
+      final response = await delete(Uri.parse("${DataSeeker.url}/${todo.id}"));
+    } catch (err) {
+      print(err);
+    }
+  }
+}
